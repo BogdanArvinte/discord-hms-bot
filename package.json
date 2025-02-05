@@ -1,0 +1,23 @@
+{
+  "name": "discord-hms-bot",
+  "version": "1.0.0",
+  "description": "Discord bot to manage Home Media Servers",
+  "keywords": [
+    "discord",
+    "bot",
+    "hms"
+  ],
+  "license": "ISC",
+  "author": "mArv",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --env-file=.env --watch=. index.js",
+    "test": "exit 0"
+  },
+  "dependencies": {
+    "discord.js": "^14.17.3",
+    "fastify": "^5.2.1"
+  }
+}
