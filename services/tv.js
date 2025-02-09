@@ -55,15 +55,12 @@ export async function addTv(tvdbId) {
 }
 
 async function getSeriesByTvdbId(tvdbId) {
-  const { statusCode, body } = await request(
-    `${SONARR_API_URL}/movie/lookup?term=tvdbId:${tvdbId}`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": SONARR_API_KEY,
-      },
-    }
-  );
+  const { statusCode, body } = await request(`${SONARR_API_URL}/movie/lookup?term=tvdb:${tvdbId}`, {
+    headers: {
+      "Content-Type": "application/json",
+      "X-Api-Key": SONARR_API_KEY,
+    },
+  });
 
   if (statusCode === 200) {
     const result = await body.json();
