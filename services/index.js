@@ -15,7 +15,7 @@ export async function addMedia(type, id) {
   if (type === "tv") return await addTv(id);
   if (type === "music") return await addMusic(id);
 
-  return false;
+  return null;
 }
 
 export function getServicesMap() {

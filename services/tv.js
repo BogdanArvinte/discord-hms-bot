@@ -25,7 +25,7 @@ export async function getTvSuggestions(term = "") {
 export async function addTv(tvdbId) {
   const series = await getSeriesByTvdbId(tvdbId);
   const qualityProfileId = await getQualityProfileId();
-  const rootFolderPath = await getMovieRootFolderPath();
+  const rootFolderPath = await getSeriesRootFolderPath();
 
   if (!series || !qualityProfileId || !rootFolderPath) return null;
 
@@ -51,6 +51,7 @@ export async function addTv(tvdbId) {
     return `${response.title} (${response.year})`;
   }
 
+  console.log(statusCode, body);
   return null;
 }
 
@@ -67,7 +68,7 @@ async function getSeriesByTvdbId(tvdbId) {
 
   if (statusCode === 200) {
     const result = await body.json();
-    return result;
+    return result[0];
   }
 
   return null;
@@ -89,7 +90,7 @@ async function getQualityProfileId(profileName = "Any") {
   return 0;
 }
 
-async function getMovieRootFolderPath() {
+async function getSeriesRootFolderPath() {
   const { statusCode, body } = await request(`${SONARR_API_URL}/rootfolder`, {
     headers: {
       "Content-Type": "application/json",

@@ -39,6 +39,11 @@ export default {
           content: `"${media}" added successfully! Stay tuned for updates.`,
           flags: MessageFlagsBitField.Flags.Ephemeral,
         });
+      } else {
+        await interaction.reply({
+          content: "Failed to request media. Please try again later.",
+          flags: MessageFlagsBitField.Flags.Ephemeral,
+        });
       }
     } catch (error) {
       console.error(error);
