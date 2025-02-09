@@ -21,8 +21,8 @@ client.once(Events.ClientReady, (readyClient) => {
 
 client.on("interactionCreate", async (interaction) => {
   if (interaction.commandName === "request") {
-    if (interaction.isAutocomplete()) await RequestCommand.autocomplete(interaction);
-    if (interaction.isChatInputCommand()) await RequestCommand.execute(interaction);
+    if (interaction.isAutocomplete()) return RequestCommand.autocomplete(interaction);
+    if (interaction.isChatInputCommand()) return RequestCommand.execute(interaction);
   }
 });
 

@@ -1,4 +1,8 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, MessageFlagsBitField } from "discord.js";
+import { getTypeSuggestions, getTitleSuggestions } from "../actions/request.js";
+import { addMedia } from "../services/index.js";
+
+let isAutocompleteInProgress = false;
 
 export default {
   data: new SlashCommandBuilder()
@@ -12,7 +16,11 @@ export default {
         .setRequired(true)
     )
     .addStringOption((option) =>
-      option.setName("title").setDescription("Title of the media").setRequired(true)
+      option
+        .setName("title")
+        .setDescription("Title of the media")
+        .setAutocomplete(true)
+        .setRequired(true)
     ),
   /**
    * Responds to the `/request` command by sending a message back to the user
@@ -21,10 +29,22 @@ export default {
    * @param {ChatInputCommandInteraction} interaction - The interaction object.
    */
   async execute(interaction) {
-    await interaction.reply({
-      content: "Not yet implemented. Stay tuned!",
-      flags: MessageFlagsBitField.Flags.Ephemeral,
-    });
+    const type = interaction.options.getString("type");
+    const id = interaction.options.getString("title");
+
+    const media = await addMedia(type, id);
+
+    if (media) {
+      await interaction.reply({
+        content: `"${media}" added successfully! Stay tuned for updates.`,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
+    } else {
+      await interaction.reply({
+        content: "Failed to request media. Please try again later.",
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
+    }
   },
   /**
    * This function is called when the user is filling out the options for
@@ -36,28 +56,32 @@ export default {
    * @returns {Promise<void>} The function does not return any value.
    */
   async autocomplete(interaction) {
-    const focusedValue = interaction.options.getFocused();
+    if (isAutocompleteInProgress) return;
+
+    const focused = interaction.options.getFocused(true);
     const channel = interaction.channel.name;
 
-    const choices = [
-      { name: "Movie", value: "movie" },
-      { name: "TV Show", value: "tv" },
-      { name: "Music", value: "music" },
-    ];
-
-    const index = choices.findIndex((c) => c.value === channel);
-
-    if (index !== -1) {
-      const matched = choices.splice(index, 1)[0];
-      choices.unshift(matched);
+    if (focused.name === "type") {
+      isAutocompleteInProgress = true;
+      const suggestions = getTypeSuggestions(channel, focused.value);
+      await interaction.respond(suggestions);
+      isAutocompleteInProgress = false;
     }
 
-    const filtered = choices.filter(
-      (choice) =>
-        choice.name.toLowerCase().startsWith(focusedValue.toLowerCase()) ||
-        choice.name.toLowerCase().includes(focusedValue.toLowerCase())
-    );
+    if (focused.name === "title") {
+      isAutocompleteInProgress = true;
 
-    await interaction.respond(filtered);
+      if (focused.value.length < 3) {
+        await interaction.respond([]);
+        isAutocompleteInProgress = false;
+        return;
+      }
+
+      const type = interaction.options.getString("type");
+      const suggestions = await getTitleSuggestions(type, focused.value);
+
+      await interaction.respond(suggestions);
+      isAutocompleteInProgress = false;
+    }
   },
 };
