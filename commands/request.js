@@ -56,7 +56,7 @@ export default {
    * @returns {Promise<void>} The function does not return any value.
    */
   async autocomplete(interaction) {
-    if (isAutocompleteInProgress) return;
+    if (isAutocompleteInProgress || !interaction) return;
 
     const focused = interaction.options.getFocused(true);
     const channel = interaction.channel.name;
