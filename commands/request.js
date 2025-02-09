@@ -32,14 +32,16 @@ export default {
     const type = interaction.options.getString("type");
     const id = interaction.options.getString("title");
 
-    const media = await addMedia(type, id);
-
-    if (media) {
-      await interaction.reply({
-        content: `"${media}" added successfully! Stay tuned for updates.`,
-        flags: MessageFlagsBitField.Flags.Ephemeral,
-      });
-    } else {
+    try {
+      const media = await addMedia(type, id);
+      if (media) {
+        await interaction.reply({
+          content: `"${media}" added successfully! Stay tuned for updates.`,
+          flags: MessageFlagsBitField.Flags.Ephemeral,
+        });
+      }
+    } catch (error) {
+      console.error(error);
       await interaction.reply({
         content: "Failed to request media. Please try again later.",
         flags: MessageFlagsBitField.Flags.Ephemeral,

@@ -24,9 +24,12 @@ export function getTypeSuggestions(channel, value) {
 export async function getTitleSuggestions(type = "", term = "") {
   const cleanedTerm = encodeURIComponent(term.trim());
 
-  if (type === "movie") return getMovieSuggestions(cleanedTerm);
-  if (type === "tv") return getTvSuggestions(cleanedTerm);
-  if (type === "music") return getMusicSuggestions(cleanedTerm);
-
-  return [];
+  try {
+    if (type === "movie") return await getMovieSuggestions(cleanedTerm);
+    if (type === "tv") return await getTvSuggestions(cleanedTerm);
+    if (type === "music") return await getMusicSuggestions(cleanedTerm);
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
 }
