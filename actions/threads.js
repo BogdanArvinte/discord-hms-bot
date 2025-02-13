@@ -12,7 +12,9 @@ export async function moveToThread(message) {
   if (!message.author.bot) return;
 
   message.embeds.forEach(async (embed) => {
-    const mediaTitle = embed.title.split("-").shift().trim();
+    const mediaTitle = embed?.title?.split("-")?.shift()?.trim();
+
+    if (!mediaTitle) return;
 
     const thread = await message.channel.threads.cache.find((t) => t.name === mediaTitle);
     const nonce = Date.now().toString();
