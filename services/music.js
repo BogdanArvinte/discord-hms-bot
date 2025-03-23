@@ -2,13 +2,19 @@ import { request } from "undici";
 
 const { LIDARR_API_URL, LIDARR_API_KEY } = process.env;
 
-export async function getMusicSuggestions(term = "") {
-  const { statusCode, body } = await request(`${LIDARR_API_URL}/artist/lookup?term=${term}`, {
-    headers: {
-      "Content-Type": "application/json",
-      "X-Api-Key": LIDARR_API_KEY,
-    },
-  });
+export async function getMusicSuggestions(term = "", signal, requestTimeout = 3e3) {
+  const encodedTerm = encodeURIComponent(term);
+  const { statusCode, body } = await request(
+    `${LIDARR_API_URL}/artist/lookup?term=${encodedTerm}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": LIDARR_API_KEY,
+      },
+      signal,
+      requestTimeout,
+    }
+  );
 
   if (statusCode === 200) {
     const results = await body.json();

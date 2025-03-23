@@ -1,21 +1,25 @@
 import { request } from "undici";
 
-const { SONARR_API_URL, SONARR_API_KEY } = process.env;
+const { SONARR_API_URL, SONARR_API_KEY, TVDB_API_URL } = process.env;
 
-export async function getTvSuggestions(term = "") {
-  const { statusCode, body } = await request(`${SONARR_API_URL}/series/lookup?term=${term}`, {
+export async function getTvSuggestions(query = "", signal, requestTimeout = 3e3) {
+  const { TVDB_API_TOKEN } = process.env;
+  const params = new URLSearchParams({ limit: 5, type: "series", query });
+
+  const { statusCode, body } = await request(`${TVDB_API_URL}/search?${params}`, {
     headers: {
       "Content-Type": "application/json",
-      "X-Api-Key": SONARR_API_KEY,
+      Authorization: `Bearer ${TVDB_API_TOKEN}`,
     },
+    signal,
+    requestTimeout,
   });
 
   if (statusCode === 200) {
-    const results = await body.json();
-    const firstResults = results.slice(0, 5);
-    return firstResults.map((result) => ({
-      name: `📺 ${result.title} (${result.year})`,
-      value: `${result.tvdbId}`,
+    const { data } = await body.json();
+    return data?.map((result) => ({
+      name: `📺 ${result.name} (${result.year})`,
+      value: `${result.tvdb_id}`,
     }));
   }
 

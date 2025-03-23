@@ -21,13 +21,13 @@ export function getTypeSuggestions(channel, value) {
     .map((option) => ({ name: services[option].name, value: option }));
 }
 
-export async function getTitleSuggestions(type = "", term = "") {
-  const cleanedTerm = encodeURIComponent(term.trim());
+export async function getTitleSuggestions(type = "", term = "", signal) {
+  const cleanedTerm = term.trim();
 
   try {
-    if (type === "movie") return await getMovieSuggestions(cleanedTerm);
-    if (type === "tv") return await getTvSuggestions(cleanedTerm);
-    if (type === "music") return await getMusicSuggestions(cleanedTerm);
+    if (type === "movie") return await getMovieSuggestions(cleanedTerm, signal);
+    if (type === "tv") return await getTvSuggestions(cleanedTerm, signal);
+    if (type === "music") return await getMusicSuggestions(cleanedTerm, signal);
   } catch (error) {
     console.error(error);
     return [];

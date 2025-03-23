@@ -1,7 +1,8 @@
-import { Client, Events, GatewayIntentBits } from "discord.js";
+import { Client, Events, GatewayIntentBits, MessageFlagsBitField } from "discord.js";
 import { moveToThread } from "./actions/threads.js";
 import { registerCommands } from "./commands/index.js";
 import RequestCommand from "./commands/request.js";
+import DonateCommand from "./commands/donate.js";
 
 const { DISCORD_TOKEN } = process.env;
 
@@ -21,9 +22,14 @@ client.once(Events.ClientReady, (readyClient) => {
 
 client.on("interactionCreate", async (interaction) => {
   if (interaction.commandName === "request") {
-    if (interaction.isAutocomplete()) return RequestCommand.autocomplete(interaction);
-    if (interaction.isChatInputCommand()) return RequestCommand.execute(interaction);
+    try {
+      if (interaction.isAutocomplete()) return await RequestCommand.autocomplete(interaction);
+      if (interaction.isChatInputCommand()) return await RequestCommand.execute(interaction);
+    } catch (error) {
+      console.info(error);
+    }
   }
+  if (interaction.commandName === "donate") return DonateCommand.execute(interaction);
 });
 
 client.on("messageCreate", async (message) => {

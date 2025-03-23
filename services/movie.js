@@ -1,21 +1,25 @@
 import { request } from "undici";
 
-const { RADARR_API_URL, RADARR_API_KEY } = process.env;
+const { RADARR_API_URL, RADARR_API_KEY, TVDB_API_URL } = process.env;
 
-export async function getMovieSuggestions(term = "") {
-  const { statusCode, body } = await request(`${RADARR_API_URL}/movie/lookup?term=${term}`, {
+export async function getMovieSuggestions(query = "", signal, requestTimeout = 3e3) {
+  const { TVDB_API_TOKEN } = process.env;
+  const params = new URLSearchParams({ limit: 5, type: "movie", query });
+
+  const { statusCode, body } = await request(`${TVDB_API_URL}/search?${params}`, {
     headers: {
       "Content-Type": "application/json",
-      "X-Api-Key": RADARR_API_KEY,
+      Authorization: `Bearer ${TVDB_API_TOKEN}`,
     },
+    signal,
+    requestTimeout,
   });
 
   if (statusCode === 200) {
-    const results = await body.json();
-    const firstResults = results.slice(0, 5);
-    return firstResults.map((result) => ({
-      name: `🎥 ${result.title} (${result.year})`,
-      value: `${result.tmdbId}`,
+    const { data } = await body.json();
+    return data?.map((result) => ({
+      name: `📺 ${result.name} (${result.year})`,
+      value: `${result.tvdb_id}`,
     }));
   }
 

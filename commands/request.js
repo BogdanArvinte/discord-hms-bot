@@ -1,8 +1,7 @@
 import { SlashCommandBuilder, ChatInputCommandInteraction, MessageFlagsBitField } from "discord.js";
 import { getTypeSuggestions, getTitleSuggestions } from "../actions/request.js";
 import { addMedia } from "../services/index.js";
-
-let isAutocompleteInProgress = false;
+import { tvdbLogin } from "../services/tvdb.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -63,32 +62,27 @@ export default {
    * @returns {Promise<void>} The function does not return any value.
    */
   async autocomplete(interaction) {
-    if (isAutocompleteInProgress || !interaction) return;
+    if (!interaction) return;
 
     const focused = interaction.options.getFocused(true);
     const channel = interaction.channel.name;
 
     if (focused.name === "type") {
-      isAutocompleteInProgress = true;
       const suggestions = getTypeSuggestions(channel, focused.value);
-      await interaction.respond(suggestions);
-      isAutocompleteInProgress = false;
+      return interaction.respond(suggestions);
     }
 
     if (focused.name === "title") {
-      isAutocompleteInProgress = true;
+      if (focused.value.length < 3) return interaction.respond([]);
 
-      if (focused.value.length < 3) {
-        await interaction.respond([]);
-        isAutocompleteInProgress = false;
-        return;
-      }
+      await tvdbLogin();
 
+      console.time(focused.value);
       const type = interaction.options.getString("type");
       const suggestions = await getTitleSuggestions(type, focused.value);
+      console.timeEnd(focused.value);
 
-      await interaction.respond(suggestions);
-      isAutocompleteInProgress = false;
+      return interaction.respond(suggestions);
     }
   },
 };
