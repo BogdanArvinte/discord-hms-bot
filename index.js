@@ -1,4 +1,4 @@
-import { Client, Events, GatewayIntentBits, MessageFlagsBitField } from "discord.js";
+import { Client, Events, GatewayIntentBits } from "discord.js";
 import { moveToThread } from "./actions/threads.js";
 import { registerCommands } from "./commands/index.js";
 import RequestCommand from "./commands/request.js";

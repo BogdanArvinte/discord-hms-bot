@@ -19,7 +19,7 @@ export async function getMovieSuggestions(query = "", signal, requestTimeout = 3
     const { data } = await body.json();
     return data?.map((result) => ({
       name: `📺 ${result.name} (${result.year})`,
-      value: `${result.tvdb_id}`,
+      value: `${result.remote_ids?.find((id) => id.sourceName === "TheMovieDB.com")?.id}`,
     }));
   }
 
