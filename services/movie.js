@@ -36,6 +36,7 @@ export async function addMovie(tmdbId) {
   movie.qualityProfileId = qualityProfileId;
   movie.rootFolderPath = rootFolderPath;
   movie.monitored = true;
+  movie.minimumAvailability = "released";
   movie.addOptions = {
     monitor: "movieOnly",
     searchForMovie: true,
