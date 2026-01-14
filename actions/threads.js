@@ -12,7 +12,7 @@ export async function moveToThread(message) {
   if (!message.author.bot) return;
 
   message.embeds.forEach(async (embed) => {
-    const mediaTitle = embed?.title?.split("-")?.slice(0, -1)?.join("-")?.trim();
+    const mediaTitle = embed?.title?.replace(/\s-\s.+$/, '')?.trim();
 
     if (!mediaTitle) return;
 
